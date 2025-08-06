@@ -46,6 +46,24 @@ def load_pdfs_from_directory(data_dir="./data", chunk_size=200):
     index.add(np.array(vectors))
 
 
+# === 4. Retrieve context from FAISS ===
+def retrieve_context(query, k=3):
+    query_vec = embedder.encode([query])
+    D, I = index.search(np.array(query_vec), k)
+    return [(documents[i], doc_sources[i]) for i in I[0]]
+
+# === 5. DuckDuckGo Search ===
+def duckduckgo_search(query):
+    if not query.strip():
+        return "No result found (empty query)."
+    with DDGS() as ddgs:
+        results = list(ddgs.text(query, max_results=1))
+        if results:
+            return results[0].get("body", "No result found.")
+        else:
+            return "No result found."
+
+
 
 # Why is RAG more accurate than traditional LLMs?
 # What are the components of a RAG pipeline?
