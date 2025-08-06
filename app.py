@@ -21,3 +21,34 @@ index = faiss.IndexFlatL2(embedding_dim)
 documents = []     # Chunked text content
 doc_sources = []   # Metadata: file + page
 
+# === 3. Load and chunk PDFs ===
+def load_pdfs_from_directory(data_dir="./data", chunk_size=200):
+    global documents, doc_sources
+    print(f"\n Loading PDFs from '{data_dir}'...\n")
+
+    for filename in os.listdir(data_dir):
+        if filename.endswith(".pdf"):
+            filepath = os.path.join(data_dir, filename)
+            doc = fitz.open(filepath)
+            for page_num, page in enumerate(doc):
+                text = page.get_text()
+                chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+                documents.extend(chunks)
+                doc_sources.extend([f"{filename} - page {page_num+1}"] * len(chunks))
+
+    if len(documents) == 0:
+        print(" No PDF content found in './data'! Please add PDFs before running.")
+        exit(1)
+
+    print(f"✅ Loaded {len(documents)} chunks from PDFs.\n")
+
+    vectors = embedder.encode(documents)
+    index.add(np.array(vectors))
+
+
+
+# Why is RAG more accurate than traditional LLMs?
+# What are the components of a RAG pipeline?
+
+# Who is the CEO of Hugging Face in 2025?
+# What are the top open-source LLMs in 2025?
