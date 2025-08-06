@@ -40,7 +40,7 @@ def load_pdfs_from_directory(data_dir="./data", chunk_size=200):
         print(" No PDF content found in './data'! Please add PDFs before running.")
         exit(1)
 
-    print(f"✅ Loaded {len(documents)} chunks from PDFs.\n")
+    print(f"Loaded {len(documents)} chunks from PDFs.\n")
 
     vectors = embedder.encode(documents)
     index.add(np.array(vectors))
@@ -62,6 +62,29 @@ def duckduckgo_search(query):
             return results[0].get("body", "No result found.")
         else:
             return "No result found."
+
+
+
+# === 6. Validate PDF answer quality ===
+def validate_answer_sufficiency(answer, query):
+    validation_prompt = f"""
+You are a helpful assistant evaluating your previous answer.
+
+Question: {query}
+
+Answer:
+{answer}
+
+Is this answer sufficient, accurate, and complete to fully answer the question? Respond with one word only: YES or NO.
+"""
+    validation_response = model.generate_content(validation_prompt).text.strip().upper()
+    print(f"\n Gemini's validation response for PDF answer: {validation_response}\n")
+    return validation_response == "YES"
+
+
+
+
+
 
 
 
