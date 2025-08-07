@@ -84,7 +84,63 @@ Is this answer sufficient, accurate, and complete to fully answer the question? 
 
 
 
+# === 7. Main agent function ===
+def agentic_rag(query):
+    # Step 1: Retrieve from PDF and generate refined answer
+    chunks = retrieve_context(query)
+    context = "\n".join([chunk for chunk, _ in chunks])
+    sources = ", ".join(set(src for _, src in chunks))
+    print("\n Retrieved context from PDF:\n" + context[:1000] + "\n...") 
 
+    pdf_prompt = f"""
+You are a helpful assistant.
+
+Based on the following context from PDF documents, answer the question.
+Start your answer explicitly by mentioning: "Answer from PDF retrieval:" followed by your answer.
+
+Context:
+{context}
+
+Question: {query}
+"""
+    pdf_answer = model.generate_content(pdf_prompt).text.strip()
+
+    # Step 2: Validate PDF answer sufficiency
+    if validate_answer_sufficiency(pdf_answer, query):
+        return f"(Answer from PDF retrieval: {sources})\n{pdf_answer}"
+
+    # Step 3: If PDF answer is insufficient, do DuckDuckGo search and generate answer
+    raw_search_result = duckduckgo_search(query)
+    print("\n Retrieved result from DuckDuckGo:\n" + raw_search_result + "\n")
+    search_prompt = f"""
+You are a helpful assistant.
+
+Based on the following DuckDuckGo search result, answer the question clearly.
+Start your answer explicitly by mentioning: "Answer from DuckDuckGo search:" followed by your answer.
+
+Search Result:
+{raw_search_result}
+
+Question: {query}
+"""
+    search_answer = model.generate_content(search_prompt).text.strip()
+    return f"(Answer from DuckDuckGo search)\n{search_answer}"
+
+# === 8. CLI Chat Loop ===
+if __name__ == "__main__":
+    load_pdfs_from_directory("./data")
+    print("\nGemini Agentic RAG Ready! Type 'exit' to quit.\n")
+
+    while True:
+        query = input("You: ").strip()
+        if query.lower() in ["exit", "quit"]:
+            print("Goodbye!")
+            break
+        elif not query:
+            print("Please enter a question.")
+            continue
+        response = agentic_rag(query)
+        print("Bot:", response)
 
 
 
