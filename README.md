@@ -123,6 +123,10 @@ You: exit
 * 📄 Works with any number of PDFs
 * 💬 Chat-like interface in terminal
 
+---
+
+## Thank You
+
 
 
 
