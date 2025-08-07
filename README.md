@@ -1,5 +1,3 @@
-
-```markdown
 # 🤖 Agentic RAG PDF Chatbot
 
 This is a smart assistant that can **read and answer questions** from PDF documents. If the PDFs don't have enough information, it will automatically **search the web** (using DuckDuckGo) and give a better answer. It's powered by **Google Gemini AI** and works right from your terminal!
@@ -125,7 +123,6 @@ You: exit
 * 📄 Works with any number of PDFs
 * 💬 Chat-like interface in terminal
 
----
 
 
 
